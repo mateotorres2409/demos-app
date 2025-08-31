@@ -9,7 +9,7 @@ on:
       context:
         required: true
         type: string
-      project:
+      image_name:
         required: true
         type: string
     secrets:
@@ -51,9 +51,9 @@ jobs:
         id: tag
         run: |
           if [ -n "${GITHUB_REF_TYPE}" ] && [ "${GITHUB_REF_TYPE}" == "tag" ]; then
-            echo "image_tag=${{ inputs.project }}.${GITHUB_REF_NAME}" >> $GITHUB_OUTPUT
+            echo "image_tag=${GITHUB_REF_NAME}" >> $GITHUB_OUTPUT
           else
-            echo "image_tag=${{ inputs.project }}.${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+            echo "image_tag=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
           fi
       - name: Build and push
         id: build
@@ -65,4 +65,4 @@ jobs:
           push: true
           attests: type=sbom
           platforms: linux/amd64,linux/arm64
-          tags: ${{ secrets.DOCKER_REGISTRY_URI }}:${{ steps.tag.outputs.image_tag }}
+          tags: ${{ secrets.DOCKER_REGISTRY_URI }}:${{ inputs.image_name }}-${{ steps.tag.outputs.image_tag }}
