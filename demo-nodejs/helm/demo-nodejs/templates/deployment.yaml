@@ -8,7 +8,9 @@ metadata:
     git.commit.sha: {{ .Values.gitCommit | default "unknown" | quote }}
 spec:
   revisionHistoryLimit: {{ .Values.revisionHistoryLimit }}
-  replicas: {{ if not .Values.autoscaling.enabled }}{{ .Values.replicaCount }}{{ else }}1{{ end }}
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
   selector:
     matchLabels:
       {{- include "project-demo.selectorLabels" . | nindent 6 }}
