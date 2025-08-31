@@ -1,0 +1,101 @@
+name: Template GitOps PR
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+      image_tag:
+        required: true
+        type: string
+      values_file_path:
+        required: true
+        type: string
+      app_name:
+        required: true
+        type: string
+      env_repo:
+        required: true
+        type: string
+    secrets:
+      ENV_REPO_PAT:
+        description: "PAT con permisos 'contents:write' para el repo de entorno"
+        required: true
+
+permissions:
+  contents: write
+  pull-requests: write
+  id-token: write
+
+jobs:
+  gitops_pr:
+    runs-on: ubuntu-latest
+    env:
+      APP_NAME: ${{ inputs.app_name }}
+      ENV_REPO: ${{ inputs.env_repo }}
+      VALUES_FILE_PATH: ${{ inputs.values_file_path }}
+      IMAGE_TAG: ${{ inputs.image_tag }}
+    steps:
+      - name: Checkout environment repo
+        env:
+          GH_TOKEN: ${{ secrets.ENV_REPO_PAT }}
+        run: |
+          set -euo pipefail
+          # Clone directly with token (x-access-token format recommended)
+          git clone "https://x-access-token:${GH_TOKEN}@github.com/${ENV_REPO}.git" env-repo
+      - name: Validate push permissions
+        working-directory: env-repo
+        env:
+          GH_TOKEN: ${{ secrets.ENV_REPO_PAT }}
+        run: |
+          set -euo pipefail
+          # Quick remote reachability
+          git ls-remote --heads origin >/dev/null || { echo "::error::Cannot access remote heads"; exit 1; }
+          # Dry-run push to verify permission without creating a persistent branch
+          if git push --dry-run origin HEAD:refs/heads/_permcheck_test 2>/dev/null; then
+            echo "Push permission OK"
+          else
+            echo "::error::Push failed (dry-run). Ensure PAT has 'Contents: Read & Write' for ${ENV_REPO}."; exit 1
+          fi
+      - name: Update values file
+        id: update
+        run: |
+          set -euo pipefail
+          cd env-repo
+          BRANCH="gitops/${APP_NAME}-${IMAGE_TAG}"
+          if [[ ! -f "$VALUES_FILE_PATH" ]]; then
+            echo "Values file $VALUES_FILE_PATH not found" >&2
+            exit 1
+          fi
+          sed -i.bak -E "s|^(\\s*tag:\\s*).*|\\1${IMAGE_TAG}|" "$VALUES_FILE_PATH"
+          rm -f "$VALUES_FILE_PATH.bak"
+          if git diff --quiet; then
+            echo "changed=no" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          # Leave changes staged/uncommitted? We'll stage only; action will commit.
+          git add "$VALUES_FILE_PATH"
+          echo "changed=yes" >> $GITHUB_OUTPUT
+          echo "branch=$BRANCH" >> $GITHUB_OUTPUT
+      - name: Create PR
+        if: steps.update.outputs.changed == 'yes'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.ENV_REPO_PAT }}
+          path: env-repo
+          commit-message: "chore(${{ inputs.app_name }}): bump image tag to ${{ inputs.image_tag }}"
+          branch: ${{ steps.update.outputs.branch }}
+          base: main
+          title: "chore(${{ inputs.app_name }}): promote ${{ inputs.image_tag }}"
+          body: |
+            Automated promotion for ${{ inputs.app_name }}.
+            New image tag: `${{ inputs.image_tag }}`
+            Merge to let ArgoCD sync.
+          delete-branch: true
+      - name: Summary
+        run: |
+          echo "Image tag: ${IMAGE_TAG}" >> $GITHUB_STEP_SUMMARY
+          if [[ "${{ steps.update.outputs.changed }}" != "yes" ]]; then
+            echo "No changes (image tag already current)." >> $GITHUB_STEP_SUMMARY
+          fi
