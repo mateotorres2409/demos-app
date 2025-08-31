@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "project-demo.fullname" . }}
+  labels:
+    {{- include "project-demo.labels" . | nindent 4 }}
+  annotations:
+    git.commit.sha: {{ .Values.gitCommit | default "unknown" | quote }}
+spec:
+  revisionHistoryLimit: {{ .Values.revisionHistoryLimit }}
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "project-demo.selectorLabels" . | nindent 6 }}
+  strategy:
+    type: {{ .Values.deploymentStrategy.type }}
+    {{- if eq .Values.deploymentStrategy.type "RollingUpdate" }}
+    rollingUpdate:
+      maxSurge: {{ .Values.deploymentStrategy.rollingUpdate.maxSurge }}
+      maxUnavailable: {{ .Values.deploymentStrategy.rollingUpdate.maxUnavailable }}
+    {{- end }}
+  template:
+    metadata:
+      labels:
+        {{- include "project-demo.selectorLabels" . | nindent 8 }}
+        {{- with .Values.podLabels }}{{ toYaml . | nindent 8 }}{{ end }}
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    spec:
+      imagePullSecrets:
+        {{- with .Values.imagePullSecrets }}{{ toYaml . | nindent 6 }}{{ end }}
+      containers:
+        - name: {{ include "project-demo.fullname" . }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.appPort }}
+          env:
+            {{- range $k, $v := .Values.env.static }}
+            - name: {{ $k }}
+              value: "{{ $v }}"
+            {{- end }}
+          envFrom:
+            - configMapRef:
+                name: {{ include "project-demo.fullname" . }}

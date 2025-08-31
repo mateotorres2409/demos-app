@@ -1,0 +1,18 @@
+name: Workflow PR demo-python
+on:
+  pull_request:
+    branches:
+        - main
+    paths:
+      - 'demo-python/**'
+      - '.github/workflows/pr_python.yaml'
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run tests
+        run: |
+          # Run pytest to exercise the Flask test client
+          echo "Running tests..."

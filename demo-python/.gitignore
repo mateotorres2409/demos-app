@@ -1,0 +1,47 @@
+# Entorno virtual
+venv/
+ENV/
+.venv/
+
+# Archivos de Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pdb
+*.pkl
+
+# Archivos de logs
+*.log
+
+# Archivos de entorno
+.env
+.env.*
+
+# Configuración de IDE
+.vscode/
+.idea/
+*.swp
+
+# Archivos de pruebas
+.coverage
+*.cover
+*.pytest_cache/
+.tox/
+htmlcov/
+
+# Archivos de build / dist
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Archivos temporales del sistema
+.DS_Store
+Thumbs.db
+
+# Docker
+*.pid
+*.seed
+*.tar
+docker-compose.override.yml
