@@ -1,4 +1,4 @@
-name: Pull Request Workflow demo-nodejs
+name: Workflow PR demo-nodejs
 on:
   pull_request:
     branches:

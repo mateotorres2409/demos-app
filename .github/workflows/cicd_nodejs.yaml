@@ -1,4 +1,4 @@
-name: CI/CD Workflow demo-nodejs
+name: Workflow CI/CD demo-nodejs
 on:
   push:
     tags:

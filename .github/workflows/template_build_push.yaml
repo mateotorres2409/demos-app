@@ -1,4 +1,4 @@
-name: x-Build Workflow template
+name: Template x-Build Workflow
 
 on:
   workflow_call:
