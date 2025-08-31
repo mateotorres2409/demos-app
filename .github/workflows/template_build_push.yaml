@@ -23,6 +23,9 @@ on:
       image_tag:
         description: "The new docker image tag"
         value: ${{ jobs.build_and_push.outputs.image_tag }}
+      image_tag_private:
+        description: "The new docker image tag public"
+        value: ${{ jobs.build_and_push.outputs.image_tag_private }}
 
 # Permissions for the token
 permissions:
@@ -35,6 +38,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       image_tag: ${{ steps.tag.outputs.image_tag }}
+      image_tag_private: ${{ steps.tag.outputs.image_tag_private }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -52,8 +56,10 @@ jobs:
         run: |
           if [ -n "${GITHUB_REF_TYPE}" ] && [ "${GITHUB_REF_TYPE}" == "tag" ]; then
             echo "image_tag=${GITHUB_REF_NAME}" >> $GITHUB_OUTPUT
+            echo "image_tag_private=${{ inputs.image_name }}-${GITHUB_REF_NAME}" >> $GITHUB_OUTPUT
           else
             echo "image_tag=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+            echo "image_tag_private=${{ inputs.image_name }}-${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
           fi
       - name: Build and push
         id: build
@@ -65,4 +71,4 @@ jobs:
           push: true
           attests: type=sbom
           platforms: linux/amd64,linux/arm64
-          tags: ${{ secrets.DOCKER_REGISTRY_URI }}:${{ inputs.image_name }}-${{ steps.tag.outputs.image_tag }}
+          tags: ${{ secrets.DOCKER_REGISTRY_URI }}:${{ steps.tag.outputs.image_tag_private }}

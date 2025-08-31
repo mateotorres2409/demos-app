@@ -22,15 +22,16 @@ jobs:
       DOCKER_REGISTRY_URI: ${{ secrets.DOCKER_REGISTRY_URI }}
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+      
 
-  #deploy_to_eks:
-  #  needs: build
-  #  uses: ./.github/workflows/template_gitops.yaml
-  #  with:
-  #    environment: prod
-  #    image_tag: ${{ needs.build.outputs.image_tag }}
-  #    values_file_path: clusters/prod/apps/webapp-color.values.yaml
-  #    app_name: webapp-color
-  #    env_repo: josefloressv/kcd_colombia_env
-  #  secrets:
-  #    ENV_REPO_PAT: ${{ secrets.ENV_REPO_PAT }}
+  deploy_to_k8s:
+    needs: build
+    uses: ./.github/workflows/template_gitops.yaml
+    with:
+      environment: prod
+      image_tag: ${{ needs.build.outputs.image_tag_private }}
+      values_file_path: demo-nodejs/prod/values.yaml
+      app_name: demo-nodejs
+      env_repo: mateotorres2409/demos-env
+    secrets:
+      ENV_REPO_PAT: ${{ secrets.ENV_REPO_PAT }}
