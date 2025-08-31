@@ -22,10 +22,10 @@ on:
     outputs:
       image_tag:
         description: "The new docker image tag"
-        value: ${{ jobs.build_and_push.outputs.image_tag }}
+        value: ${{ jobs.docker.outputs.image_tag }}
       image_tag_private:
-        description: "The new docker image tag public"
-        value: ${{ jobs.build_and_push.outputs.image_tag_private }}
+        description: "The new docker image tag private"
+        value: ${{ jobs.docker.outputs.image_tag_private }}
 
 # Permissions for the token
 permissions:
