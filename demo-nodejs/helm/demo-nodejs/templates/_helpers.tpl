@@ -27,12 +27,3 @@ app.kubernetes.io/version: "{{ .Chart.AppVersion }}"
 app.kubernetes.io/managed-by: "{{ .Release.Service }}"
 environment: "{{ .Values.environment }}"
 {{- end -}}
-
-{{/* ServiceAccount name */}}
-{{- define "project-demo.serviceAccountName" -}}
-{{- if .Values.serviceAccount.name -}}
-{{ .Values.serviceAccount.name }}
-{{- else -}}
-{{ include "project-demo.fullname" . }}
-{{- end -}}
-{{- end -}}
