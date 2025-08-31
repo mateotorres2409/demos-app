@@ -70,6 +70,8 @@ jobs:
           fi
           sed -i.bak -E "s|^(\\s*tag:\\s*).*|\\1${IMAGE_TAG}|" "$VALUES_FILE_PATH"
           rm -f "$VALUES_FILE_PATH.bak"
+          sed -i.bak -E "s|^(\\s*gitCommit:\\s*).*|\\1${GITHUB_SHA}|" "$VALUES_FILE_PATH"
+          rm -f "$VALUES_FILE_PATH.bak"
           if git diff --quiet; then
             echo "changed=no" >> $GITHUB_OUTPUT
             exit 0
