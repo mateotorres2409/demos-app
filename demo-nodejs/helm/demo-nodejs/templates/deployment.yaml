@@ -6,6 +6,7 @@ metadata:
     {{- include "project-demo.labels" . | nindent 4 }}
   annotations:
     git.commit.sha: {{ .Values.gitCommit | default "unknown" | quote }}
+    instrumentation.opentelemetry.io/{{ .Values.instrumentation }}: {{ .Values.inject | default "false" | quote }}
 spec:
   revisionHistoryLimit: {{ .Values.revisionHistoryLimit }}
   {{- if not .Values.autoscaling.enabled }}
