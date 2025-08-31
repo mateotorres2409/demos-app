@@ -1,27 +1,44 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: demo-nodejs
+  name: {{ include "project-demo.fullname" . }}
   labels:
-    app: demo-nodejs
+    {{- include "project-demo.labels" . | nindent 4 }}
+  annotations:
+    git.commit.sha: {{ .Values.gitCommit | default "unknown" | quote }}
 spec:
-  replicas: 1
+  revisionHistoryLimit: {{ .Values.revisionHistoryLimit }}
+  replicas: {{ if not .Values.autoscaling.enabled }}{{ .Values.replicaCount }}{{ else }}1{{ end }}
   selector:
     matchLabels:
-      app: demo-nodejs
+      {{- include "project-demo.selectorLabels" . | nindent 6 }}
+  strategy:
+    type: {{ .Values.deploymentStrategy.type }}
+    {{- if eq .Values.deploymentStrategy.type "RollingUpdate" }}
+    rollingUpdate:
+      maxSurge: {{ .Values.deploymentStrategy.rollingUpdate.maxSurge }}
+      maxUnavailable: {{ .Values.deploymentStrategy.rollingUpdate.maxUnavailable }}
+    {{- end }}
   template:
     metadata:
       labels:
-        app: demo-nodejs
+        {{- include "project-demo.selectorLabels" . | nindent 8 }}
+        {{- with .Values.podLabels }}{{ toYaml . | nindent 8 }}{{ end }}
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
     spec:
       imagePullSecrets:
-        - name: dockerhub-secret
+        {{- with .Values.imagePullSecrets }}{{ toYaml . | nindent 6 }}{{ end }}
       containers:
-        - name: demo-nodejs
+        - name: {{ include "project-demo.fullname" . }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
-            - containerPort: 3000
+            - containerPort: {{ .Values.appPort }}
           env:
-            - name: NODE_ENV
-              value: "production"
+            {{- range $k, $v := .Values.env.static }}
+            - name: {{ $k }}
+              value: "{{ $v }}"
+            {{- end }}

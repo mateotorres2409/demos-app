@@ -1,13 +1,13 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: demo-nodejs-service
+  name: {{ include "project-demo.fullname" . }}
   labels:
-    app: demo-nodejs
+    {{- include "project-demo.labels" . | nindent 4 }}
 spec:
   type: {{ .Values.service.type }}
   selector:
-    app: demo-nodejs
+    {{- include "project-demo.selectorLabels" . | nindent 4 }}
   ports:
     - port: {{ .Values.service.port }}
       targetPort: {{ .Values.service.targetPort }}
