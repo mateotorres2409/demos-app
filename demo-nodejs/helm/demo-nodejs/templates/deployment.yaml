@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-nodejs
+  labels:
+    app: demo-nodejs
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: demo-nodejs
+  template:
+    metadata:
+      labels:
+        app: demo-nodejs
+    spec:
+      imagePullSecrets:
+        - name: dockerhub-secret
+      containers:
+        - name: demo-nodejs
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3000
+          env:
+            - name: NODE_ENV
+              value: "production"
