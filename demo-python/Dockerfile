@@ -5,13 +5,13 @@ FROM python:3.13.7-slim
 WORKDIR /app
 
 # Copiar requirements primero (para aprovechar cache en builds)
-COPY requirements.txt .
+COPY ./app/requirements.txt .
 
 # Instalar dependencias
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copiar el código del proyecto
-COPY ./app .
+COPY ./app/main.py .
 
 # Exponer puerto de FastAPI
 EXPOSE 8000
