@@ -40,12 +40,12 @@ spec:
           ports:
             - containerPort: {{ .Values.appPort }}
           env:
-            {{- range $k, $v := .Values.env.static }}
+          {{- range $k, $v := .Values.env.static }}
             - name: {{ $k }}
               value: "{{ $v }}"
-            {{- end }}
+          {{- end }}
           envFrom:
             - configMapRef:
                 name: {{ include "project-demo.fullname" . }}
           resources:
-            {{- with .Values.resources }}{{ toYaml . | nindent 8 }}{{ end }}
+            {{- with .Values.resources }}{{ toYaml . | nindent 12 }}{{ end }}
