@@ -44,3 +44,5 @@ spec:
             - name: {{ $k }}
               value: "{{ $v }}"
             {{- end }}
+          resources:
+            {{- with .Values.resources }}{{ toYaml . | nindent 8 }}{{ end }}
