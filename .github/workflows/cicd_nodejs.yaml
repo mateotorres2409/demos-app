@@ -4,7 +4,7 @@ on:
     tags:
       - '[0-9]+.[0-9]+.[0-9]+' # Matches Semver-like tags such as 1.0.0
     paths:
-      - 'apps/demo-nodejs/**'
+      - 'demo-nodejs/app/**'
       - '.github/workflows/cicd_nodejs.yaml'
 
 permissions:

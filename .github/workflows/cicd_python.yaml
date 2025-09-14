@@ -4,7 +4,7 @@ on:
     tags:
       - '[0-9]+.[0-9]+.[0-9]+' # Matches Semver-like tags such as 1.0.0
     paths:
-      - 'apps/demo-python/**'
+      - 'demo-python/app/**'
       - '.github/workflows/cicd_python.yaml'
 
 permissions:

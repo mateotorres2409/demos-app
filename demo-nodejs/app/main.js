@@ -7,7 +7,7 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 // Endpoint del collector (desde variable de entorno)
-const otelCollectorUrl = process.env.OTEL_EXPORTER_OTLP_ENDPOINT || "grpc://localhost:4317";
+const otelCollectorUrl = process.env.OTEL_EXPORTER_OTLP_GRPC_ENDPOINT || "grpc://localhost:4317";
 console.log(`Using OTLP collector at: ${otelCollectorUrl}`);
 
 // Exportador OTLP vía gRPC
