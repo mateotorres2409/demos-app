@@ -12,11 +12,11 @@ spec:
   - type: cpu
     metricType: Utilization
     metadata:
-      value:  {{ .Values.scaledobject.cpuUtilizationPercentage }}
+      value:  "{{ .Values.scaledobject.cpuUtilizationPercentage }}"
       containerName: {{ include "project-demo.fullname" . }}
   - type: memory
     metricType: Utilization
     metadata:
-      value:  {{ .Values.scaledobject.memoryUtilizationPercentage }}
+      value:  "{{ .Values.scaledobject.memoryUtilizationPercentage }}"
       containerName: {{ include "project-demo.fullname" . }}
 {{- end }}
