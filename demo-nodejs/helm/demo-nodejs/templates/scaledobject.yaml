@@ -1,0 +1,22 @@
+{{- if .Values.scaledobject.enabled }}
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: {{ include "project-demo.fullname" . }}
+spec:
+  minReplicaCount: {{ .Values.scaledobject.minReplicaCount | default 1 }}
+  maxReplicaCount: {{ .Values.scaledobject.maxReplicaCount | default 3 }}
+  scaleTargetRef:
+    name: {{ include "project-demo.fullname" . }}
+  triggers:
+  - type: cpu
+    metricType: Utilization
+    metadata:
+      value:  {{ .Values.scaledobject.cpuUtilizationPercentage }}
+      containerName: {{ include "project-demo.fullname" . }}
+  - type: memory
+    metricType: Utilization
+    metadata:
+      value:  {{ .Values.scaledobject.memoryUtilizationPercentage }}
+      containerName: {{ include "project-demo.fullname" . }}
+{{- end }}
