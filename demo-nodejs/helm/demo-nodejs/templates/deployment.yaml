@@ -44,5 +44,8 @@ spec:
             - name: {{ $k }}
               value: "{{ $v }}"
           {{- end }}
+          envFrom:
+            - configMapRef:
+                name: {{ include "project-demo.fullname" . }}
           resources:
             {{- with .Values.resources }}{{ toYaml . | nindent 12 }}{{ end }}
