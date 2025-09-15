@@ -7,6 +7,6 @@ spec:
   scaleTargetRef:
     name: {{ include "project-demo.fullname" . }}
   {{- with .Values.scaledobject.spec }}
-    {{- toYaml . | nindent 3 }}
+    {{- toYaml . | nindent 2 }}
   {{- end }}
 {{- end }}
