@@ -8,7 +8,7 @@ metadata:
     git.commit.sha: {{ .Values.gitCommit | default "unknown" | quote }}
 spec:
   revisionHistoryLimit: {{ .Values.revisionHistoryLimit }}
-  {{- if and (not .Values.autoscaling.enabled) (not .Values.scaledobject.enabled) }}
+  {{- if not .Values.scaledobject.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}
   selector:
